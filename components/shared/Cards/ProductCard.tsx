@@ -44,53 +44,53 @@ const ProductCard: React.FC<ProductCardProps> = ({
           source={{ uri: image }}
           style={styles.image}
           resizeMode="cover"
-        />
+          />
       </TouchableOpacity>
 
       {/* Content Section */}
       <View style={styles.content}>
-        {/* Header with Title and Dots */}
-        <View style={styles.header} >
+        <View>
+            {/* Header with Title and Dots */}
+            <View style={styles.header} >
+              <Text
+                style={[styles.title, { color: colors.text }]}
+                numberOfLines={2}
+              >
+                {title}
+              </Text>
+              <TouchableOpacity onPress={onDotsPress} style={styles.dotsButton}>
+                <MaterialCommunityIcons
+                  name="dots-vertical"
+                  size={20}
+                  color={colors.subText}
+                />
+              </TouchableOpacity>
+            </View>
 
-          <Text
-            style={[styles.title, { color: colors.text }]}
-            numberOfLines={2}
-          >
-            {title}
-          </Text>
-          <TouchableOpacity onPress={onDotsPress} style={styles.dotsButton}>
-            <MaterialCommunityIcons
-              name="dots-vertical"
-              size={20}
-              color={colors.subText}
-            />
-          </TouchableOpacity>
-        </View>
+            {/* Location and Time Row */}
+            <View style={styles.infoRow}>
+              <View style={styles.infoItem}>
+                <MaterialIcons name="location-on" size={14} color={colors.subText} />
+                <Text style={[styles.infoText, { color: colors.subText }]}>
+                  {distance}
+                </Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Ionicons name="time-outline" size={14} color={colors.subText} />
+                <Text style={[styles.infoText, { color: colors.subText }]}>
+                  {time}
+                </Text>
+              </View>
+            </View>
 
-        {/* Location and Time Row */}
-        <View style={styles.infoRow}>
-          <View style={styles.infoItem}>
-            <MaterialIcons name="location-on" size={14} color={colors.subText} />
-            <Text style={[styles.infoText, { color: colors.subText }]}>
-              {distance}
+            {/* Address */}
+            <Text
+              style={[styles.address, { color: colors.subText }]}
+              numberOfLines={1}
+            >
+              {address}
             </Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Ionicons name="time-outline" size={14} color={colors.subText} />
-            <Text style={[styles.infoText, { color: colors.subText }]}>
-              {time}
-            </Text>
-          </View>
         </View>
-
-        {/* Address */}
-        <Text
-          style={[styles.address, { color: colors.subText }]}
-          numberOfLines={1}
-        >
-          {address}
-        </Text>
-
         {/* Price and Likes Row */}
         <View style={styles.footer}>
           <Text style={[styles.price, { color: colors.text }]}>
@@ -115,18 +115,18 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderColor: Colors.light.borderColor,
     marginVertical: 0,
-    paddingVertical: 14,
+    paddingVertical: 10,
     marginHorizontal: 12,
   },
   image: {
-    width: 120,
+    width: 130,
     height: 130,
-    borderTopLeftRadius: 12,
-    borderBottomLeftRadius: 12,
+    borderRadius: 8,
   },
   content: {
     flex: 1,
-    padding: 12,
+    paddingLeft: 10,
+    paddingVertical: 2,
     justifyContent: 'space-between',
   },
   header: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 8,
     gap: 12,
   },
   infoItem: {

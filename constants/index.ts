@@ -1,7 +1,7 @@
 export const fakeProducts = [
 	{
 		image: 'https://mihome.uz/wp-content/uploads/2024/04/6212.jpg.webp',
-		title: 'A comfortable two-room apartment with..',
+		title: 'A comfortable ',
 		distance: '1 km',
 		time: '10 min',
 		address: 'Toshkent, Yunusobod 12',
