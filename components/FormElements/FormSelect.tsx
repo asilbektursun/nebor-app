@@ -67,7 +67,7 @@ const FormSelect = ({
               ]}>
                 <ComboboxValue placeholder={placeholder} style={styles.valueText} />
               </ComboboxTrigger>
-              <ComboboxContent maxHeight={300}>
+              <ComboboxContent maxHeight={500}>
                 {inputPlaceholder && <ComboboxInput placeholder={inputPlaceholder} />}
                 <ComboboxList style={styles.list}>
                   {options.length === 0 && <ComboboxEmpty>{t('form_elements.select.no_framework_found')}</ComboboxEmpty>}

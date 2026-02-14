@@ -1,10 +1,11 @@
 import { useCategoriesQuery, useCreateProductMutation, useUploadImageMutation } from '@/api/hooks';
-import { Category, ECurrencyType, EProductType } from '@/api/types';
+import { Category } from '@/api/types';
 import FormCheckbox from '@/components/FormElements/FormCheckbox';
 import FormInput from '@/components/FormElements/FormInput';
 import FormSelect from '@/components/FormElements/FormSelect';
 import { useTranslations } from '@/hooks/use-translation';
 import { useColor } from '@/hooks/useColor';
+import { useAuthStore } from '@/modules/Auth/auth-store';
 import { useRouter } from 'expo-router';
 import { MapPin } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -15,11 +16,17 @@ import ImageUploader from '../FormElements/ImageUploader';
 import RadioButtonGroup, { RadioOption } from '../FormElements/RadioButtonGroup';
 import MapModal from '../MapModal';
 
-
-
+// Basic UUID generator for draft IDs (client-side only, non-critical)
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 
 const CreateThingForm = () => {
   const { t, locale } = useTranslations();
+  const { token } = useAuthStore()
   const primaryColor = useColor('primaryColor');
   const textColor = useColor('text');
   const router = useRouter();
@@ -92,7 +99,10 @@ const CreateThingForm = () => {
       return;
     }
 
+    console.log(token)
+
     try {
+      // 1. Upload images sequentially to get draft UUIDs
       const uploadedImages = await Promise.all(
         data.images.map(async (imageUri: string, index: number) => {
           const imageFormData = new FormData();
@@ -106,68 +116,59 @@ const CreateThingForm = () => {
           const response = await uploadImage(imageFormData);
 
           return {
-            draft_uuid: response?.data?.draft_uuid,
-            image: imageFile,
+            draft_uuid: response?.data?.draft_uuid || response?.data?.data?.draft_uuid,
+            image: imageUri,
             sort_order: index
           };
         })
       );
 
-      // Create main FormData for product creation
+      // 2. Create product FormData
       const formData = new FormData();
+      formData.append('product_type', '1000'); // Thing
 
-      // Add product type
-      formData.append('product_type', EProductType.THING.toString());
-
-      // Add basic fields
       formData.append('title', data.title);
       formData.append('description', data.description || '');
-
-      // Add category if selected
       if (data.category) {
         formData.append('category_id', data.category);
       }
 
-      // Add pricing based on selling method
       const isFree = data.sellingMethod === 'free';
       formData.append('is_free', isFree.toString());
 
       if (isFree) {
-        formData.append('currency_type', ECurrencyType.UZS.toString());
+        formData.append('currency_type', 'UZS');
       } else {
-        const currencyType = data.currency === 'USD' ? ECurrencyType.USD : ECurrencyType.UZS;
-        formData.append('currency_type', currencyType.toString());
-
+        formData.append('currency_type', data.currency === 'SUM' ? 'UZS' : data.currency);
         const priceField = data.currency === 'USD' ? 'price_usd' : 'price_uzs';
         formData.append(priceField, data.price);
-
         formData.append('is_negotiable', data.canDeal.toString());
       }
 
-      // Add location
       formData.append('latitude', location.latitude.toString());
       formData.append('longitude', location.longitude.toString());
       formData.append('moljal', location.address || data.location);
 
-      // Add uploaded images
+      // Add uploaded images info
       uploadedImages.forEach((img, index) => {
-        if (index === 0) {
-          formData.append('main_image_url', img.image);
-        }
-
         if (img.draft_uuid) {
           formData.append(`images[${index}].draft_uuid`, img.draft_uuid);
         }
         formData.append(`images[${index}].image_url`, img.image);
         formData.append(`images[${index}].sort_order`, img.sort_order.toString());
+
+        // Handle main image
+        if (index === 0) {
+          formData.append('main_image_url', img.image);
+        }
       });
 
-      // console.log('FormData:', JSON.stringify((formData as any)._parts));
+      await createProduct(formData);
 
-      createProduct(formData);
     } catch (error: any) {
-      console.error('Image upload failed:', error);
-      Alert.alert(t('post.error'), error?.response?.data?.message || error?.message || t('post.error_uploading_images'));
+      console.error('Submission failed:', error);
+      const message = error?.response?.data?.message || error?.message || t('post.error_creating_product');
+      Alert.alert(t('post.error'), message);
     }
   });
 
@@ -266,7 +267,7 @@ const CreateThingForm = () => {
                     }}
                   />
                 </View>
-                <View style={styles.currencyButtons}>
+                <View style={[styles.currencyButtons, { marginBottom: form.formState.errors.price ? 20 : 0 }]}>
                   <TouchableOpacity
                     style={[
                       styles.currencyButton,

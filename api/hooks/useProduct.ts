@@ -94,9 +94,9 @@ export const useToggleLikeMutation = (
  * Hook to upload product image
  */
 export const useUploadImageMutation = (
-  options?: UseMutationOptions<AxiosResponse<any>, Error, FormData>
+  options?: UseMutationOptions<AxiosResponse<any>, Error, any>
 ) => {
-  return useMutation<AxiosResponse<any>, Error, FormData>({
+  return useMutation<AxiosResponse<any>, Error, any>({
     mutationKey: ['UPLOAD_IMAGE'],
     mutationFn: (data) => productService.uploadImage(data),
     ...options,

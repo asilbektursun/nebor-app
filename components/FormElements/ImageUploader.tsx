@@ -28,9 +28,9 @@ const ImageUploader = ({
   const textColor = useColor('text');
   const destructiveColor = useColor('destructive');
   const borderColor = useColor('borderColor');
-  const primaryColor = useColor('primaryColor'); 
+  const primaryColor = useColor('primaryColor');
 
-  const pickImage = async (currentImages: string[], onChange: (images: string[]) => void) => {
+  const pickImage = async (currentImages: any[], onChange: (images: any[]) => void) => {
     if (currentImages.length >= maxImages) {
       return;
     }
@@ -46,26 +46,28 @@ const ImageUploader = ({
       mediaTypes: "images",
       allowsEditing: false,
       allowsMultipleSelection: true,
+      selectionLimit: maxImages,
       quality: 0.8,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
+
       // Get URIs from all selected images
-      const selectedImageUris = result.assets.map(asset => asset.uri);
-      
+      const selectedImageUris = result.assets;
+
       // Calculate how many more images we can add
       const remainingSlots = maxImages - currentImages.length;
-      
+
       // Take only the first N images that fit within the limit
       const imagesToAdd = selectedImageUris.slice(0, remainingSlots);
-      
+
       // Combine current images with new ones
       const newImages = [...currentImages, ...imagesToAdd];
       onChange(newImages);
     }
   };
 
-  const removeImage = (index: number, currentImages: string[], onChange: (images: string[]) => void) => {
+  const removeImage = (index: number, currentImages: any[], onChange: (images: any[]) => void) => {
     const newImages = currentImages.filter((_, i) => i !== index);
     onChange(newImages);
   };
@@ -82,8 +84,8 @@ const ImageUploader = ({
         name={name!}
         control={control}
         rules={rules}
-        render={({ field: { onChange, value = [] }, fieldState: { error } }) => (
-          <>
+        render={({ field: { onChange, value = [] }, fieldState: { error } }) => {
+          return <>
             <ThemedScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -118,9 +120,9 @@ const ImageUploader = ({
               </TouchableOpacity>
 
               {/* Display Selected Images */}
-              {value.map((uri: string, index: number) => (
-                <View key={index} style={styles.imageContainer}>
-                  <Image source={{ uri }} style={styles.image} />
+              {value.map((image: any, index: number) => (
+                <View key={image?.assetId} style={styles.imageContainer}>
+                  <Image source={{ uri: image?.uri }} style={styles.image} />
                   <TouchableOpacity
                     style={[styles.removeButton, { backgroundColor: destructiveColor }]}
                     onPress={() => removeImage(index, value, onChange)}
@@ -137,7 +139,7 @@ const ImageUploader = ({
               </Text>
             )}
           </>
-        )}
+        }}
       />
     </View>
   );

@@ -1,8 +1,8 @@
 import axiosInstance from '../api';
 import type {
-    DeleteProductImagesRequestDto,
-    ProductLikeDto,
-    ProductListParams,
+  DeleteProductImagesRequestDto,
+  ProductLikeDto,
+  ProductListParams,
 } from '../types';
 
 export const productService = {
@@ -69,7 +69,7 @@ export const productService = {
    * POST /api/product/upload-image
    * Note: This endpoint expects multipart/form-data
    */
-  uploadImage: (data: FormData) => {
+  uploadImage: (data: any) => {
     return axiosInstance.post('/product/upload-image', data, {
       headers: {
         'Content-Type': 'multipart/form-data',
