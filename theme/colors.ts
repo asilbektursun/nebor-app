@@ -74,9 +74,9 @@ const lightColors = {
 	secondaryColor: '#fff',
 	subText: '#939496',
 
-	background: '#fff',
-	profileBackground: '#f7f9fa',
-	taBarBg: '#fff',
+	background: '#f8f8f8de',
+	profileBackground: '#f8f8f8de',
+	taBarBg: '#f8f8f8de',
 
 	// tab icons related colors
 	tabIconBackground: '#E6F7ED',

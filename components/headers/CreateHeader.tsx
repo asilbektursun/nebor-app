@@ -17,7 +17,7 @@ const CreateHeader = () => {
   }
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: colors.background, borderBottomColor: colors.borderColor }]}>
+    <ThemedView style={[styles.container, { borderBottomColor: colors.borderColor, backgroundColor: colors.taBarBg }]}>
       <TouchableOpacity 
         style={[styles.backButton, { borderColor: colors.borderColor }]} 
         onPress={handleBack}
@@ -34,7 +34,7 @@ const CreateHeader = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: Platform.OS === 'ios' ? 100 : 100,
+    height: Platform.OS === 'ios' ? 40 : 60,
     display: "flex",
     flexDirection: "row",
     alignItems: 'flex-end',

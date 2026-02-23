@@ -106,6 +106,7 @@
 		"product_created_successfully": "Product created successfully!",
 		"error": "Error",
 		"error_creating_product": "Failed to create product. Please try again.",
+		"error_uploading_images": "An error occurred while uploading images.",
 		"please_select_location": "Please select a location on the map",
 		"errors": {
 			"title": "Title is required",

@@ -57,7 +57,10 @@ const FormSelect = ({
         rules={rules}
         render={({ field, fieldState: { error } }) => (
           <>
-            <Combobox value={field.value} onValueChange={field.onChange}>
+            <Combobox
+              value={options.find((o) => o.value === field.value) ?? null}
+              onValueChange={(option) => field.onChange(option?.value ?? null)}
+            >
               <ComboboxTrigger style={[
                 styles.trigger,
                 {

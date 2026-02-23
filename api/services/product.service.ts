@@ -66,11 +66,11 @@ export const productService = {
 
   /**
    * Upload product image
-   * POST /api/product/upload-image
+   * POST /api/product/images/upload-draft
    * Note: This endpoint expects multipart/form-data
    */
   uploadImage: (data: any) => {
-    return axiosInstance.post('/product/upload-image', data, {
+    return axiosInstance.post('/product/images/upload-draft', data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

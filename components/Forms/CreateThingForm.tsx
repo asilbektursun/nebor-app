@@ -1,5 +1,5 @@
 import { useCategoriesQuery, useCreateProductMutation, useUploadImageMutation } from '@/api/hooks';
-import { Category } from '@/api/types';
+import { Category, ECurrencyType, EProductType } from '@/api/types';
 import FormCheckbox from '@/components/FormElements/FormCheckbox';
 import FormInput from '@/components/FormElements/FormInput';
 import FormSelect from '@/components/FormElements/FormSelect';
@@ -54,9 +54,10 @@ const CreateThingForm = () => {
   const { data: categories } = useCategoriesQuery();
 
   const categoryOptions = categories?.data?.data?.map((category: Category) => ({
-    value: category.id.toString(),
+    value: category.id,
     label: locale === 'ru' ? category.name_ru : category.name_uz,
   })) || [];
+
 
   const { mutateAsync: uploadImage, isPending: isUploading } = useUploadImageMutation();
 
@@ -75,6 +76,7 @@ const CreateThingForm = () => {
       form.reset();
     },
     onError: (error: any) => {
+      console.log('error', error);
       const message = error?.response?.data?.message || error?.message || t('post.error_creating_product');
       Alert.alert(t('post.error'), message);
     },
@@ -97,78 +99,93 @@ const CreateThingForm = () => {
     if (!location) {
       Alert.alert(t('post.error'), t('post.please_select_location'));
       return;
-    }
-
-    console.log(token)
+    } 
 
     try {
-      // 1. Upload images sequentially to get draft UUIDs
-      const uploadedImages = await Promise.all(
-        data.images.map(async (imageUri: string, index: number) => {
-          const imageFormData = new FormData();
-          const imageFile = {
-            uri: imageUri,
-            type: 'image/jpeg',
-            name: `image_${index}.jpg`,
-          } as any;
-          imageFormData.append('image', imageFile);
+      // ==========================================
+      // 1-QADAM: Rasmlarni upload qilish (Batch Upload)
+      // ==========================================
+      const imageFormData = new FormData();
 
-          const response = await uploadImage(imageFormData);
+      // data.images - expo ImagePicker asset objects: { uri, fileName, mimeType, ... }
+      data.images.forEach((image: any, index: number) => {
+        const imageFile = {
+          uri: image.uri,
+          type: image.mimeType || 'image/jpeg',
+          name: image.fileName || `image_${index}.jpg`,
+        } as any;
+        imageFormData.append('images', imageFile);
+      });
+      console.log('nimadir');
 
-          return {
-            draft_uuid: response?.data?.draft_uuid || response?.data?.data?.draft_uuid,
-            image: imageUri,
-            sort_order: index
-          };
+      // Serverga batch upload qilamiz
+      const uploadResponse = await uploadImage(imageFormData)
+        .then((res) => {
+          console.log('uploadResponse', res);
+          return res;
         })
-      );
+        .catch((error) => {
+          console.error('RAsmda Xatolik yuz berdi:', error);
+        });
 
-      // 2. Create product FormData
+      // Serverdan qaytgan rasmlar massivi
+      const uploadedImages = (uploadResponse?.data?.data || []).map((item: any, index: number) => ({
+        draft_uuid: item.draft_uuid,
+        image_url: item.draft_image_url || item.image_url,
+        sort_order: index,
+      }));
+
+      // ==========================================
+      // 2-QADAM: Create uchun asosiy FormData'ni yig'ish
+      // ==========================================
       const formData = new FormData();
-      formData.append('product_type', '1000'); // Thing
 
+      formData.append('product_type', EProductType.THING.toString());
       formData.append('title', data.title);
       formData.append('description', data.description || '');
+
       if (data.category) {
         formData.append('category_id', data.category);
+      } else {
+        // category_id bo'sh bo'lsa, xato ko'rsatamiz (server '' ni qabul qilmaydi)
+        Alert.alert(t('post.error'), t('post.errors.category'));
+        return;
       }
 
       const isFree = data.sellingMethod === 'free';
       formData.append('is_free', isFree.toString());
 
       if (isFree) {
-        formData.append('currency_type', 'UZS');
+        formData.append('currency_type', ECurrencyType.UZS.toString());
       } else {
-        formData.append('currency_type', data.currency === 'SUM' ? 'UZS' : data.currency);
+        const currencyType = data.currency === 'USD' ? ECurrencyType.USD : ECurrencyType.UZS;
+        formData.append('currency_type', currencyType.toString());
         const priceField = data.currency === 'USD' ? 'price_usd' : 'price_uzs';
-        formData.append(priceField, data.price);
+        formData.append(priceField, data.price.toString());
         formData.append('is_negotiable', data.canDeal.toString());
       }
 
       formData.append('latitude', location.latitude.toString());
       formData.append('longitude', location.longitude.toString());
-      formData.append('moljal', location.address || data.location);
+      // moljal max 50 belgi (server talabi)
+      const moljalValue = (location.address || data.location || '').substring(0, 50);
+      formData.append('moljal', moljalValue);
 
-      // Add uploaded images info
-      uploadedImages.forEach((img, index) => {
-        if (img.draft_uuid) {
-          formData.append(`images[${index}].draft_uuid`, img.draft_uuid);
-        }
-        formData.append(`images[${index}].image_url`, img.image);
-        formData.append(`images[${index}].sort_order`, img.sort_order.toString());
+      // ==========================================
+      // 3-QADAM: Rasmlar ma'lumotini qo'shish
+      // ==========================================
+      formData.append('images_json', JSON.stringify(uploadedImages));
 
-        // Handle main image
-        if (index === 0) {
-          formData.append('main_image_url', img.image);
-        }
-      });
+      if (uploadedImages.length > 0 && uploadedImages[0].image_url) {
+        formData.append('main_image_url', uploadedImages[0].image_url);
+      }
 
-      await createProduct(formData);
+      // API'ga jo'natamiz 
+      createProduct(formData);
 
     } catch (error: any) {
-      console.error('Submission failed:', error);
-      const message = error?.response?.data?.message || error?.message || t('post.error_creating_product');
-      Alert.alert(t('post.error'), message);
+      console.error('Xatolik yuz berdi:', error);
+      Alert.alert(t('post.error'), error?.response?.data?.message || error?.message || t('post.error_uploading_images'));
     }
   });
 
@@ -445,6 +462,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 10,
   },
   postButtonText: {
     color: '#fff',

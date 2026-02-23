@@ -102,6 +102,11 @@
 		"price_placeholder": "Narxni kiriting",
 		"location_placeholder": "Manzilni kiriting",
 		"extra_info_placeholder": "Qo'shimcha ma'lumot kiriting",
+		"success": "Muvaffaqiyatli",
+		"product_created_successfully": "E'lon muvaffaqiyatli yaratildi!",
+		"error_creating_product": "E'lon yaratishda xatolik yuz berdi. Qayta urinib ko'ring.",
+		"error_uploading_images": "Rasmlarni yuklashda xatolik yuz berdi.",
+		"please_select_location": "Iltimos, xaritada manzilni tanlang.",
 		"errors": {
 			"title": "Sarlavha kiriting",
 			"category": "Kategoriya kiriting",

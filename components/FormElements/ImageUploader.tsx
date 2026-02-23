@@ -121,8 +121,8 @@ const ImageUploader = ({
 
               {/* Display Selected Images */}
               {value.map((image: any, index: number) => (
-                <View key={image?.assetId} style={styles.imageContainer}>
-                  <Image source={{ uri: image?.uri }} style={styles.image} />
+                <View key={image?.assetId || image?.uri || `image-${index}`} style={styles.imageContainer}>
+                  <Image source={{ uri: image?.uri || image }} style={styles.image} />
                   <TouchableOpacity
                     style={[styles.removeButton, { backgroundColor: destructiveColor }]}
                     onPress={() => removeImage(index, value, onChange)}

@@ -13,12 +13,13 @@
 		},
 		"androidStatusBar": {
 			"translucent": false,
-			"backgroundColor": "#ffffff"
+			"backgroundColor": "#f8f8f8de"
 		},
 		"androidNavigationBar": {
-			"visible": "immersive",
+			"visible": "sticky-immersive",
 			"barStyle": "dark-content",
-			"enforceContrast": true
+			"backgroundColor": "#f8f8f8de",
+			"enforceContrast": false
 		},
 		"jsEngine": "hermes",
 		"android": {

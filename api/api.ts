@@ -26,30 +26,30 @@ axiosInstance.interceptors.request.use(
 );
 
 // Response interceptor for global error handling
-axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    // Handle common errors
-    if (error.response) {
-      // Server responded with error
-      const { status } = error.response;
+// axiosInstance.interceptors.response.use(
+//   (response) => {
+//     return response;
+//   },
+//   (error) => {
+//     // Handle common errors
+//     if (error.response) {
+//       // Server responded with error
+//       const { status } = error.response;
       
-      if (status === 401) {
-        // Unauthorized - clear auth state
-        useAuthStore.getState().logout();
-      }
-    } else if (error.request) {
-      // Request made but no response
-      console.error('Network Error:', error.message);
-    } else {
-      // Something else happened
-      console.error('Error:', error.message);
-    }
+//       if (status === 401) {
+//         // Unauthorized - clear auth state
+//         useAuthStore.getState().logout();
+//       }
+//     } else if (error.request) {
+//       // Request made but no response
+//       console.error('Network Error:', error.message);
+//     } else {
+//       // Something else happened
+//       console.error('Error:', error.message);
+//     }
     
-    return Promise.reject(error);
-  }
-);
+//     return Promise.reject(error);
+//   }
+// );
 
 export default axiosInstance;

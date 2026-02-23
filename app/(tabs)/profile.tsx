@@ -1,6 +1,5 @@
 import ProfilePageHeader from '@/components/headers/ProfilePageHeader'
 import { LanguageSelector } from '@/components/Settings/LanguageSelector'
-import { Switch } from '@/components/ui/switch'
 import { useThemeColors } from '@/hooks/use-theme-colors'
 import { useTranslations } from '@/hooks/use-translation'
 import { useColor } from '@/hooks/useColor'
@@ -21,11 +20,10 @@ import {
 	MapPin,
 	MessageCircle,
 	MessageSquare,
-	Moon,
 	Package,
 	Settings,
 	ShieldCheck,
-	Sparkles,
+	Sparkles
 } from 'lucide-react-native'
 import React, { useState } from 'react'
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -172,14 +170,14 @@ const ProfilePage = () => {
 						subtitle={getLanguageName(locale)}
 						onPress={() => setIsLanguageModalVisible(true)}
 					/>
-					<ProfileMenuItem
+					{/* <ProfileMenuItem
 						icon={Moon}
 						title={t('profile.theme')}
 						showChevron={false}
 						rightContent={
 							<Switch value={isDark} onValueChange={value => setMode(value ? 'dark' : 'light')} />
 						}
-					/>
+					/> */}
 				</ProfileSection>
 
 				{/* Support & Information Section */}

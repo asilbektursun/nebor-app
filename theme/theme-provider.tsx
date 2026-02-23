@@ -6,15 +6,12 @@ import {
 import 'react-native-reanimated';
 
 import { Colors } from '@/theme/colors';
-import { useColorScheme } from 'react-native';
 
 type Props = {
   children: React.ReactNode;
 };
 
 export const ThemeProvider = ({ children }: Props) => {
-  const colorScheme = useColorScheme();
-
   // Create custom themes that use your Colors
   const customLightTheme = {
     ...DefaultTheme,
@@ -44,7 +41,7 @@ export const ThemeProvider = ({ children }: Props) => {
 
   return (
     <RNThemeProvider
-      value={colorScheme === 'dark' ? customDarkTheme : customLightTheme}
+      value={customLightTheme}
     >
       {children}
     </RNThemeProvider>
