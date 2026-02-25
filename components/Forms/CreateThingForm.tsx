@@ -95,6 +95,28 @@ const CreateThingForm = () => {
     },
   ];
 
+  const handleTestSubmit = () => {
+    const formData = new FormData();
+    formData.append('product_type', EProductType.THING.toString());
+    formData.append('title', 'Test Static Product');
+    formData.append('description', 'This is a static description for testing purposes.');
+
+    // Choose first available category
+    const catId = categoryOptions?.[0]?.value?.toString() || '1';
+    formData.append('category_id', catId);
+
+    formData.append('is_free', 'false');
+    formData.append('currency_type', ECurrencyType.UZS.toString());
+    formData.append('price_uzs', '50000');
+    formData.append('is_negotiable', 'true');
+    formData.append('latitude', '41.2995');
+    formData.append('longitude', '69.2401');
+    formData.append('moljal', 'Test Moljal');
+    formData.append('images_json', JSON.stringify([]));
+
+    createProduct(formData);
+  };
+
   const handleSubmit = form.handleSubmit(async (data) => {
     if (!location) {
       Alert.alert(t('post.error'), t('post.please_select_location'));
@@ -231,6 +253,8 @@ const CreateThingForm = () => {
             required
             rules={{
               required: t('post.errors.title'),
+              minLength: { value: 5, message: 'Min length 5' },
+              maxLength: { value: 100, message: 'Max length 100' }
             }}
           />
 
@@ -253,6 +277,10 @@ const CreateThingForm = () => {
             placeholder={t('post.description_placeholder')}
             type="textarea"
             rows={5}
+            rules={{
+              minLength: { value: 15, message: 'Min length 15' },
+              maxLength: { value: 1000, message: 'Max length 1000' }
+            }}
           />
         </View>
 
@@ -281,6 +309,8 @@ const CreateThingForm = () => {
                     required
                     rules={{
                       required: t('post.errors.price'),
+                      min: { value: 0.01, message: 'Min price 0.01' },
+                      max: { value: 999999999.99, message: 'Max price 999.99M' }
                     }}
                   />
                 </View>
@@ -344,6 +374,7 @@ const CreateThingForm = () => {
                 required
                 rules={{
                   required: t('post.errors.location'),
+                  maxLength: { value: 50, message: 'Max length 50' }
                 }}
               />
             </View>
@@ -360,6 +391,13 @@ const CreateThingForm = () => {
 
       {/* Fixed Bottom Post Button */}
       <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.postButton, { backgroundColor: 'orange', marginBottom: 10 }]}
+          onPress={handleTestSubmit}
+        >
+          <Text style={styles.postButtonText}>TEST STATIC SUBMIT</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={[
             styles.postButton,

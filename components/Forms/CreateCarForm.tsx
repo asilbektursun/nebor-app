@@ -235,6 +235,7 @@ const CreateCarForm = () => {
             required
             rules={{
               required: t('car.errors.brand'),
+              maxLength: { value: 50, message: 'Max length 50' }
             }}
           />
 
@@ -246,6 +247,7 @@ const CreateCarForm = () => {
             required
             rules={{
               required: t('car.errors.model'),
+              maxLength: { value: 50, message: 'Max length 50' }
             }}
           />
 
@@ -260,6 +262,8 @@ const CreateCarForm = () => {
                 required
                 rules={{
                   required: t('car.errors.year'),
+                  min: { value: 1900, message: 'Min year 1900' },
+                  max: { value: new Date().getFullYear(), message: `Max year ${new Date().getFullYear()}` }
                 }}
               />
             </View>
@@ -318,6 +322,8 @@ const CreateCarForm = () => {
                 required
                 rules={{
                   required: t('car.errors.price'),
+                  min: { value: 0.01, message: 'Min price 0.01' },
+                  max: { value: 999999999.99, message: 'Max price 999.99M' }
                 }}
               />
             </View>
@@ -384,6 +390,7 @@ const CreateCarForm = () => {
                 required
                 rules={{
                   required: t('car.errors.location'),
+                  maxLength: { value: 50, message: 'Max length 50' }
                 }}
               />
             </View>
@@ -401,6 +408,9 @@ const CreateCarForm = () => {
             name="landmark"
             label={t('car.landmark')}
             placeholder={t('car.landmark_placeholder')}
+            rules={{
+              maxLength: { value: 50, message: 'Max length 50' }
+            }}
           />
         </View>
 
@@ -416,6 +426,9 @@ const CreateCarForm = () => {
             placeholder={t('car.additional_notes_placeholder')}
             type="textarea"
             rows={4}
+            rules={{
+              maxLength: { value: 1000, message: 'Max length 1000' }
+            }}
           />
         </View>
       </View>

@@ -25,7 +25,7 @@ const AuthPage = () => {
 
   const { register, login } = useAuthStore()
 
-  const [phoneNumber, setPhoneNumber] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('+998')
   const [isLoading, setIsLoading] = useState(false)
   const phoneInputRef = useRef<TextInput>(null)
 
@@ -35,27 +35,36 @@ const AuthPage = () => {
   }, [])
 
   const formatPhone = (raw: string): string => {
-    const digits = raw.replace(/\D/g, '')
-    if (digits.length <= 2) return digits
-    if (digits.length <= 5) return `${digits.slice(0, 2)} ${digits.slice(2)}`
-    if (digits.length <= 7)
-      return `${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5)}`
-    return `${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 7)} ${digits.slice(7, 9)}`
+    let digits = raw.replace(/\D/g, '')
+    if (!digits.startsWith('998')) {
+      digits = '998' + digits
+    }
+    const local = digits.slice(3)
+    if (local.length === 0) return '+998'
+    if (local.length <= 2) return `+998 ${local}`
+    if (local.length <= 5) return `+998 ${local.slice(0, 2)} ${local.slice(2)}`
+    if (local.length <= 7)
+      return `+998 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5)}`
+    return `+998 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 7)} ${local.slice(7, 9)}`
   }
 
   const handlePhoneChange = (text: string) => {
-    const digits = text.replace(/\D/g, '')
-    if (digits.length <= 9) {
-      setPhoneNumber(digits)
+    let digits = text.replace(/\D/g, '')
+    if (!digits.startsWith('998')) {
+      digits = '998'
+    }
+    if (digits.length <= 12) {
+      setPhoneNumber('+' + digits)
     }
   }
 
   const handleDone = useCallback(async () => {
-    if (phoneNumber.length !== 9 || isLoading) return
+    const isComplete = phoneNumber.replace(/\D/g, '').length === 12
+    if (!isComplete || isLoading) return
 
     setIsLoading(true)
     try {
-      const fullPhone = `+998${phoneNumber}`
+      const fullPhone = `+${phoneNumber.replace(/\D/g, '')}`
       await register(fullPhone)
       router.replace('/(tabs)/home')
     } catch (error: any) {
@@ -68,7 +77,8 @@ const AuthPage = () => {
         message.toLowerCase().includes('exists')
       ) {
         try {
-          await login(`+998${phoneNumber}`)
+          const fullPhoneLogin = `+${phoneNumber.replace(/\D/g, '')}`
+          await login(fullPhoneLogin)
           router.replace('/(tabs)/home')
           return
         } catch (loginError) {
@@ -82,7 +92,7 @@ const AuthPage = () => {
     }
   }, [phoneNumber, isLoading, register, router, t])
 
-  const isDoneEnabled = phoneNumber.length === 9 && !isLoading
+  const isDoneEnabled = phoneNumber.replace(/\D/g, '').length === 12 && !isLoading
 
   return (
     <KeyboardAvoidingView
@@ -107,7 +117,6 @@ const AuthPage = () => {
 
           {/* Phone Input */}
           <View style={[styles.inputContainer, { borderColor: colors.borderColor }]}>
-            <Text style={[styles.phonePrefix, { color: colors.text }]}>+998</Text>
             <TextInput
               ref={phoneInputRef}
               style={[styles.phoneNumber, { color: colors.text }]}
@@ -116,7 +125,7 @@ const AuthPage = () => {
               placeholder={t('auth.verification.phone_placeholder')}
               placeholderTextColor={colors.subText}
               keyboardType="phone-pad"
-              maxLength={12} // Adjusted for spaces in formatted phone
+              maxLength={17}
             />
           </View>
 

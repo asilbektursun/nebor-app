@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { ImagePlus, X } from 'lucide-react-native';
 import React from 'react';
 import { Control, Controller } from 'react-hook-form';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ThemedScrollView from '../themed-scrollview';
 
 interface ImageUploaderProps {
@@ -53,7 +53,13 @@ const ImageUploader = ({
     if (!result.canceled && result.assets && result.assets.length > 0) {
 
       // Get URIs from all selected images
-      const selectedImageUris = result.assets;
+      const selectedImageUris = result.assets.filter(asset => {
+        if (asset.fileSize && asset.fileSize > 5 * 1024 * 1024) {
+          Alert.alert('Error', `Image cannot be larger than 5MB.`);
+          return false;
+        }
+        return true;
+      });
 
       // Calculate how many more images we can add
       const remainingSlots = maxImages - currentImages.length;

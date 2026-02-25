@@ -262,6 +262,8 @@ const CreateWorksForm = () => {
             required
             rules={{
               required: t('work.errors.job_title'),
+              minLength: { value: 5, message: 'Min length 5' },
+              maxLength: { value: 100, message: 'Max length 100' }
             }}
           />
 
@@ -335,6 +337,8 @@ const CreateWorksForm = () => {
                 required
                 rules={{
                   required: t('work.errors.salary_amount'),
+                  min: { value: 0.01, message: 'Min value 0.01' },
+                  max: { value: 999999999.99, message: 'Max value 999.99M' }
                 }}
               />
             </View>
@@ -402,6 +406,8 @@ const CreateWorksForm = () => {
             required
             rules={{
               required: t('work.errors.job_description'),
+              minLength: { value: 15, message: 'Min length 15' },
+              maxLength: { value: 1000, message: 'Max length 1000' }
             }}
           />
         </View>
@@ -433,6 +439,7 @@ const CreateWorksForm = () => {
                 required
                 rules={{
                   required: t('work.errors.location'),
+                  maxLength: { value: 50, message: 'Max length 50' }
                 }}
               />
             </View>
